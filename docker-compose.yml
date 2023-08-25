@@ -3,7 +3,6 @@ version: "3.8"
 services:
   mysql:
     image: mysql:latest
-    container_name: mysql-container
     environment:
       MYSQL_DATABASE: users
       MYSQL_USER: admin
@@ -11,13 +10,13 @@ services:
       MYSQL_ROOT_PASSWORD: admin
     ports:
       - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password --slow-query-log=1 --long-query-time=10 --slow-query-log-file=/var/log/mysql/mysql-slow.log
     volumes:
       - ./mysql_data:/var/lib/mysql
       - ./logs:/var/log/mysql
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-    container_name: elasticsearch
     volumes:
       - ./configs/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
       - elasticsearch_data:/usr/share/elasticsearch/data:z
@@ -31,7 +30,6 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.16.2
-    container_name: logstash
     volumes:
       - ./configs/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,z
       - ./configs/logstash/pipeline:/usr/share/logstash/pipeline:ro,z
@@ -44,7 +42,6 @@ services:
       - elasticsearch
   kibana:
     image: docker.elastic.co/kibana/kibana:7.16.2
-    container_name: kibana
     volumes:
       - ./configs/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,z
     ports:
@@ -53,7 +50,6 @@ services:
       - elasticsearch
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.16.2
-    container_name: filebeat
     restart: always
     user: root
     volumes:
